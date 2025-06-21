@@ -1,0 +1,221 @@
+from __future__ import annotations
+
+import asyncio
+import os
+import re
+import sys
+
+from dataclasses import dataclass
+from enum import IntEnum
+from enum import auto
+from glob import glob
+from pathlib import Path
+from typing import TYPE_CHECKING
+from typing import Protocol
+
+import dearpygui.dearpygui as dpg
+
+from html_style_enhancer.log import LOGGER_FORMAT_STR
+from html_style_enhancer.log import logger
+from html_style_enhancer.enhance import TODAY_DATE
+from html_style_enhancer.enhance import enhance
+from html_style_enhancer.settings import Settings
+
+
+if TYPE_CHECKING:
+    from typing import Any
+
+
+@dataclass(slots=True, kw_only=True)
+class Configuration:
+    input_file: str
+    font: str
+    font_size: int
+    font_color: str
+    background_image: str
+    today_date: str
+    log_file: str
+    test_mode: bool
+    html_source_column: str
+    html_source_modified_column: str
+
+
+class ElementTag(IntEnum):
+    FONT = auto()
+    FONT_SIZE = auto()
+    FONT_COLOR = auto()
+    BACKGROUND_IMAGE = auto()
+    SELECTED_DATA_FILE = auto()
+    FILE_DIALOG = auto()
+
+
+# ? Attributes of GUI that we want to pass around DearPyGUI elements
+class StatefulData(Protocol):
+    configuration: Configuration
+
+
+@dataclass(slots=True)
+class GUI:
+    configuration: Configuration
+
+    def file_selected(self, sender: str, app_data: dict[str, dict[str, str]]):
+        print("Selecting")
+        dpg.set_value(
+            ElementTag.SELECTED_DATA_FILE,
+            Path(list(app_data["selections"].values())[0]).name,
+        )
+        self.configuration.input_file = list(app_data["selections"].values())[0]
+        logger.success(f"File selected: {self.configuration.input_file}")
+
+    def create(self, font: str):
+        if not os.path.exists(self.configuration.input_file):
+            self.configuration.input_file = glob("INPUT_*.xlsx")[0]
+
+        with dpg.file_dialog(
+            directory_selector=False,
+            show=False,
+            callback=self.file_selected,
+            tag=ElementTag.FILE_DIALOG,
+            height=540,
+            width=720,
+        ):
+            dpg.add_file_extension(".xlsx", color=(255, 255, 0, 255))
+            dpg.add_file_extension(".csv", color=(255, 0, 255, 255))
+
+        dpg.add_button(
+            label="Choose the file",
+            callback=lambda: dpg.show_item(ElementTag.FILE_DIALOG),
+        )
+        dpg.add_text(
+            tag=ElementTag.SELECTED_DATA_FILE,
+            default_value=self.configuration.input_file,
+            color=(255, 0, 0, 255),
+        )
+
+        with dpg.group(width=800):
+            dpg.add_text("Font")
+            dpg.add_input_text(
+                default_value=self.configuration.font,
+                tag=ElementTag.FONT,
+            )
+
+            dpg.add_text("Font Size")
+            dpg.add_input_text(
+                default_value=str(self.configuration.font_size),
+                tag=ElementTag.FONT_SIZE,
+            )
+
+        with dpg.group(width=404):
+            dpg.add_text("Font Color")
+            r, g, b = re.findall(
+                r"rgb\((\d+),\s*(\d+),\s*(\d+)\)", self.configuration.font_color
+            )[0]
+            r, g, b = int(r), int(g), int(b)
+            dpg.add_color_picker(default_value=(r, g, b, 0), tag=ElementTag.FONT_COLOR)
+
+        with dpg.group(width=800):
+            dpg.add_text("Background Image URL")
+            dpg.add_input_text(
+                default_value=self.configuration.background_image,
+                tag=ElementTag.BACKGROUND_IMAGE,
+            )
+
+        dpg.add_button(
+            label="Proceed",
+            callback=proceed_callback,
+            user_data=self,
+        )
+
+        dpg.bind_font(font)
+
+
+async def run(settings: Settings) -> None:
+    logger.remove()
+    if settings.test_mode:
+        logger.add(
+            sys.stderr,
+            format=LOGGER_FORMAT_STR,
+            level="DEBUG",
+            colorize=True,
+            enqueue=True,
+        )
+    else:
+        logger.add(
+            sys.stderr,
+            format=LOGGER_FORMAT_STR,
+            level="INFO",
+            colorize=True,
+            enqueue=True,
+        )
+    logger.add(
+        settings.log_file,
+        format=LOGGER_FORMAT_STR,
+        enqueue=True,
+        encoding="utf-8-sig",
+        level="DEBUG",
+    )
+
+    configuration = Configuration(
+        input_file=settings.input_file,
+        font=settings.font,
+        font_size=settings.font_size,
+        font_color=settings.font_color,
+        background_image=settings.background_image,
+        today_date=TODAY_DATE,
+        log_file=settings.log_file,
+        test_mode=settings.test_mode,
+        html_source_column=settings.html_source_column,
+        html_source_modified_column=settings.html_source_modified_column,
+    )
+    gui = GUI(configuration)
+    logger.info(f"Today's date: <BLUE><white>{configuration.today_date}</white></BLUE>")
+
+    dpg.create_context()
+
+    font: Any
+    with dpg.font_registry(tag="korean"):
+        with dpg.font("NanumBarunGothic.otf", 18) as font:  # type: ignore
+            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default)
+            dpg.add_font_range_hint(dpg.mvFontRangeHint_Korean)
+            dpg.add_font_range(0x3100, 0x3FF0)
+            dpg.add_font_chars([0x3105, 0x3107, 0x3108])
+            dpg.add_char_remap(0x3084, 0x0025)
+
+    with dpg.window(tag="Primary Window", autosize=True):
+        gui.create(font)  # type: ignore
+
+    dpg.create_viewport(title="HTML Style Enhancer", width=832, height=800)
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+
+    dpg.set_primary_window("Primary Window", True)
+    dpg.start_dearpygui()
+    dpg.destroy_context()
+
+
+def proceed_callback(sender: Any, app_data: Any, stateful: StatefulData):
+    font: str = dpg.get_value(ElementTag.FONT)
+    font_size: str = dpg.get_value(ElementTag.FONT_SIZE)
+    font_color: str = dpg.get_value(ElementTag.FONT_COLOR)
+    background_image: str = dpg.get_value(ElementTag.BACKGROUND_IMAGE)
+
+    font_color = f"rgb({int(font_color[0])},{int(font_color[1])},{int(font_color[2])})"
+
+    print(f"{font = }")
+    print(f"{font_size = }")
+    print(f"{font_color = }")
+    print(f"{background_image = }")
+
+    settings = Settings(
+        test_mode=stateful.configuration.test_mode,
+        log_file=stateful.configuration.log_file,
+        input_file=stateful.configuration.input_file,
+        font=font,
+        font_size=int(font_size),
+        font_color=font_color,
+        background_image=background_image,
+        html_source_column=stateful.configuration.html_source_column,
+        html_source_modified_column=stateful.configuration.html_source_modified_column,
+    )
+
+    asyncio.run(enhance(settings))
