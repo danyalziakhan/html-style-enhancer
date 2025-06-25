@@ -15,15 +15,19 @@ from typing import Protocol
 
 import dearpygui.dearpygui as dpg
 
-from html_style_enhancer.log import LOGGER_FORMAT_STR
-from html_style_enhancer.log import logger
 from html_style_enhancer.enhance import TODAY_DATE
 from html_style_enhancer.enhance import enhance
+from html_style_enhancer.enhance import generate_styling
+from html_style_enhancer.log import LOGGER_FORMAT_STR
+from html_style_enhancer.log import logger
 from html_style_enhancer.settings import Settings
 
 
 if TYPE_CHECKING:
     from typing import Any
+
+WINDOW_WIDTH = 840
+WINDOW_HEIGHT = 800
 
 
 @dataclass(slots=True, kw_only=True)
@@ -47,6 +51,7 @@ class ElementTag(IntEnum):
     BACKGROUND_IMAGE = auto()
     SELECTED_DATA_FILE = auto()
     FILE_DIALOG = auto()
+    STYLING_PREVIEW = auto()
 
 
 # ? Attributes of GUI that we want to pass around DearPyGUI elements
@@ -66,6 +71,37 @@ class GUI:
         )
         self.configuration.input_file = list(app_data["selections"].values())[0]
         logger.success(f"File selected: {self.configuration.input_file}")
+
+    def update_styling_preview(self):
+        """Update the styling preview text field with current settings"""
+        try:
+            font = dpg.get_value(ElementTag.FONT)
+            font_size = int(dpg.get_value(ElementTag.FONT_SIZE))
+            font_color = dpg.get_value(ElementTag.FONT_COLOR)
+            background_image = dpg.get_value(ElementTag.BACKGROUND_IMAGE)
+
+            # Convert color picker values to rgb format
+            font_color_rgb = (
+                f"rgb({int(font_color[0])},{int(font_color[1])},{int(font_color[2])})"
+            )
+
+            # Create temporary settings for preview
+            temp_settings = Settings(
+                test_mode=self.configuration.test_mode,
+                log_file=self.configuration.log_file,
+                input_file=self.configuration.input_file,
+                font=font,
+                font_size=font_size,
+                font_color=font_color_rgb,
+                background_image=background_image,
+                html_source_column=self.configuration.html_source_column,
+                html_source_modified_column=self.configuration.html_source_modified_column,
+            )
+
+            styling = f'<div style="width:100%;margin:0 auto;{generate_styling(temp_settings)}"></div>'
+            dpg.set_value(ElementTag.STYLING_PREVIEW, styling)
+        except (ValueError, TypeError):
+            dpg.set_value(ElementTag.STYLING_PREVIEW, "Invalid settings")
 
     def create(self, font: str):
         if not os.path.exists(self.configuration.input_file):
@@ -92,33 +128,57 @@ class GUI:
             color=(255, 0, 0, 255),
         )
 
-        with dpg.group(width=800):
+        with dpg.group(width=WINDOW_WIDTH - 40):
             dpg.add_text("Font")
             dpg.add_input_text(
                 default_value=self.configuration.font,
                 tag=ElementTag.FONT,
+                callback=lambda: self.update_styling_preview(),
             )
 
             dpg.add_text("Font Size")
             dpg.add_input_text(
                 default_value=str(self.configuration.font_size),
                 tag=ElementTag.FONT_SIZE,
+                callback=lambda: self.update_styling_preview(),
             )
 
-        with dpg.group(width=404):
+        with dpg.group(width=WINDOW_WIDTH // 2):
             dpg.add_text("Font Color")
             r, g, b = re.findall(
                 r"rgb\((\d+),\s*(\d+),\s*(\d+)\)", self.configuration.font_color
             )[0]
             r, g, b = int(r), int(g), int(b)
-            dpg.add_color_picker(default_value=(r, g, b, 0), tag=ElementTag.FONT_COLOR)
+            dpg.add_color_picker(
+                default_value=(r, g, b, 0),
+                tag=ElementTag.FONT_COLOR,
+                callback=lambda: self.update_styling_preview(),
+            )
 
-        with dpg.group(width=800):
+        with dpg.group(width=WINDOW_WIDTH - 46):
             dpg.add_text("Background Image URL")
             dpg.add_input_text(
                 default_value=self.configuration.background_image,
                 tag=ElementTag.BACKGROUND_IMAGE,
+                callback=lambda: self.update_styling_preview(),
             )
+
+            dpg.add_text("Generated Styling Preview")
+            with dpg.child_window(
+                width=WINDOW_WIDTH - 40,
+                height=100,
+                autosize_x=False,
+                autosize_y=False,
+                border=True,
+            ):
+                dpg.add_text(
+                    default_value="",
+                    tag=ElementTag.STYLING_PREVIEW,
+                    wrap=WINDOW_WIDTH - 40,
+                )
+
+        # Initialize the styling preview
+        self.update_styling_preview()
 
         dpg.add_button(
             label="Proceed",
@@ -184,7 +244,9 @@ async def run(settings: Settings) -> None:
     with dpg.window(tag="Primary Window", autosize=True):
         gui.create(font)  # type: ignore
 
-    dpg.create_viewport(title="HTML Style Enhancer", width=832, height=800)
+    dpg.create_viewport(
+        title="HTML Style Enhancer", width=WINDOW_WIDTH, height=WINDOW_HEIGHT
+    )
     dpg.setup_dearpygui()
     dpg.show_viewport()
 

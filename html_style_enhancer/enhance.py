@@ -42,7 +42,7 @@ def parse_int(text: str) -> int:
         ) from e
 
 
-def get_data(settings: Settings):
+def get_html_sources(settings: Settings) -> list[str]:
     df = pd.read_excel(settings.input_file, dtype="str")
 
     for column in [
@@ -55,9 +55,7 @@ def get_data(settings: Settings):
             error = f'"{column}" column is not present in file "{os.path.basename(settings.input_file)}"'
             raise KeyError(error) from e
 
-    html_sources: list[str] = df[settings.html_source_column].astype(str).to_list()
-
-    return html_sources
+    return df[settings.html_source_column].astype(str).tolist()
 
 
 def generate_styling(settings: Settings):
@@ -67,7 +65,7 @@ def generate_styling(settings: Settings):
 async def enhance(settings: Settings):
     logger.log("ACTION", f"Reading <blue>{settings.input_file}</> ...")
 
-    html_sources = get_data(settings)
+    html_sources = get_html_sources(settings)
 
     series_list: list[dict[str, str]] = []
 

@@ -4,9 +4,9 @@ import sys
 
 from typing import TYPE_CHECKING
 
+from html_style_enhancer.enhance import enhance
 from html_style_enhancer.log import LOGGER_FORMAT_STR
 from html_style_enhancer.log import logger
-from html_style_enhancer.enhance import enhance
 
 
 if TYPE_CHECKING:

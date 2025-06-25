@@ -4,8 +4,8 @@ import os
 from argparse import ArgumentParser
 from multiprocessing import freeze_support
 
-from html_style_enhancer.log import logger
 from html_style_enhancer.enhance import TODAY_DATE
+from html_style_enhancer.log import logger
 from html_style_enhancer.settings import Settings
 
 
