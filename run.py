@@ -37,6 +37,12 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
+        "--output_file",
+        help="Output file",
+        type=str,
+        required=True,
+    )
+    parser.add_argument(
         "--html_source_column",
         help="HTML Source Column",
         type=str,
@@ -45,6 +51,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--html_source_modified_column",
         help="HTML Source Modified Column",
+        type=str,
+        required=True,
+    )
+    parser.add_argument(
+        "--selector",
+        help="CSS Selector of the element to apply styles",
         type=str,
         required=True,
     )
@@ -81,6 +93,8 @@ if __name__ == "__main__":
         test_mode=args.test_mode,
         log_file=args.log_file,
         input_file=args.input_file,
+        output_file=args.output_file,
+        selector=args.selector,
         font=args.font,
         font_size=args.font_size,
         font_color=args.font_color,

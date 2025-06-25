@@ -8,6 +8,8 @@ class Settings:
     test_mode: bool
     log_file: str
     input_file: str
+    output_file: str
+    selector: str
     font: str
     font_size: int
     font_color: str

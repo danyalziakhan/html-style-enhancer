@@ -81,21 +81,14 @@ async def enhance(settings: Settings):
         async with AIOFile(html_path, "r", encoding="utf-8") as f:
             document = BeautifulSoup(await f.read(), "html.parser")
 
-        wrapped_div = BeautifulSoup(
-            f'<div style="{generate_styling(settings)}"></div>', "html.parser"
-        ).div
-
-        if not wrapped_div:
-            raise AssertionError(
-                "No 'div' is present in wrapped div of custom styling."
+        # ? First div element
+        tag = document.select_one(settings.selector)
+        if not tag:
+            raise ValueError(
+                f"Element not found in html using selector: {settings.selector}"
             )
 
-        # ? First div element
-        tag = document.find("div", {"style": "width:100%; margin:0 auto"})
-        if not tag:
-            raise ValueError("Parent 'div' not found in html")
-
-        tag["style"] = f"width:100%;margin:0 auto;{generate_styling(settings)}"  # type: ignore
+        tag["style"] = f"{tag['style']};{generate_styling(settings)}"  # type: ignore
 
         childrens: Any = tag.children  # type: ignore
         for children in childrens:  # type: ignore
@@ -115,7 +108,7 @@ async def enhance(settings: Settings):
 
     df = pd.DataFrame(series_list)
 
-    output_filename = os.path.join("output", TODAY_DATE, settings.input_file)
+    output_filename = os.path.join("output", TODAY_DATE, settings.output_file)
 
     if os.path.exists(output_filename):
         os.remove(output_filename)

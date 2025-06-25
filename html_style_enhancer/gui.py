@@ -33,6 +33,8 @@ WINDOW_HEIGHT = 800
 @dataclass(slots=True, kw_only=True)
 class Configuration:
     input_file: str
+    output_file: str
+    selector: str
     font: str
     font_size: int
     font_color: str
@@ -45,6 +47,8 @@ class Configuration:
 
 
 class ElementTag(IntEnum):
+    OUTPUT_FILE = auto()
+    SELECTOR = auto()
     FONT = auto()
     FONT_SIZE = auto()
     FONT_COLOR = auto()
@@ -75,6 +79,8 @@ class GUI:
     def update_styling_preview(self):
         """Update the styling preview text field with current settings"""
         try:
+            output_file = dpg.get_value(ElementTag.OUTPUT_FILE)
+            selector = dpg.get_value(ElementTag.SELECTOR)
             font = dpg.get_value(ElementTag.FONT)
             font_size = int(dpg.get_value(ElementTag.FONT_SIZE))
             font_color = dpg.get_value(ElementTag.FONT_COLOR)
@@ -90,6 +96,8 @@ class GUI:
                 test_mode=self.configuration.test_mode,
                 log_file=self.configuration.log_file,
                 input_file=self.configuration.input_file,
+                output_file=output_file,
+                selector=selector,
                 font=font,
                 font_size=font_size,
                 font_color=font_color_rgb,
@@ -119,7 +127,7 @@ class GUI:
             dpg.add_file_extension(".csv", color=(255, 0, 255, 255))
 
         dpg.add_button(
-            label="Choose the file",
+            label="Choose the input file",
             callback=lambda: dpg.show_item(ElementTag.FILE_DIALOG),
         )
         dpg.add_text(
@@ -129,6 +137,20 @@ class GUI:
         )
 
         with dpg.group(width=WINDOW_WIDTH - 40):
+            dpg.add_text("Output File Name")
+            dpg.add_input_text(
+                default_value=self.configuration.output_file,
+                tag=ElementTag.OUTPUT_FILE,
+                callback=lambda: self.update_styling_preview(),
+            )
+
+            dpg.add_text("Selector")
+            dpg.add_input_text(
+                default_value=self.configuration.selector,
+                tag=ElementTag.SELECTOR,
+                callback=lambda: self.update_styling_preview(),
+            )
+
             dpg.add_text("Font")
             dpg.add_input_text(
                 default_value=self.configuration.font,
@@ -217,6 +239,8 @@ async def run(settings: Settings) -> None:
 
     configuration = Configuration(
         input_file=settings.input_file,
+        output_file=settings.output_file,
+        selector=settings.selector,
         font=settings.font,
         font_size=settings.font_size,
         font_color=settings.font_color,
@@ -256,6 +280,8 @@ async def run(settings: Settings) -> None:
 
 
 def proceed_callback(sender: Any, app_data: Any, stateful: StatefulData):
+    output_file: str = dpg.get_value(ElementTag.OUTPUT_FILE)
+    selector: str = dpg.get_value(ElementTag.SELECTOR)
     font: str = dpg.get_value(ElementTag.FONT)
     font_size: str = dpg.get_value(ElementTag.FONT_SIZE)
     font_color: str = dpg.get_value(ElementTag.FONT_COLOR)
@@ -272,6 +298,8 @@ def proceed_callback(sender: Any, app_data: Any, stateful: StatefulData):
         test_mode=stateful.configuration.test_mode,
         log_file=stateful.configuration.log_file,
         input_file=stateful.configuration.input_file,
+        output_file=output_file,
+        selector=selector,
         font=font,
         font_size=int(font_size),
         font_color=font_color,
