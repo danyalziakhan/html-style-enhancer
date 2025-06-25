@@ -115,4 +115,4 @@ async def enhance(settings: Settings):
 
     df.to_excel(output_filename, engine="openpyxl", index=False)
 
-    logger.success("Files have been generated")
+    logger.success(f"File <blue>{output_filename}</blue> has been generated")

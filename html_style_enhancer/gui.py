@@ -68,7 +68,7 @@ class GUI:
     configuration: Configuration
 
     def file_selected(self, sender: str, app_data: dict[str, dict[str, str]]):
-        print("Selecting")
+        logger.info("Selecting ... ")
         dpg.set_value(
             ElementTag.SELECTED_DATA_FILE,
             Path(list(app_data["selections"].values())[0]).name,
@@ -252,7 +252,7 @@ async def run(settings: Settings) -> None:
         html_source_modified_column=settings.html_source_modified_column,
     )
     gui = GUI(configuration)
-    logger.info(f"Today's date: <BLUE><white>{configuration.today_date}</white></BLUE>")
+    logger.info(f"Today's date: <blue>{configuration.today_date}</blue>")
 
     dpg.create_context()
 
@@ -269,7 +269,11 @@ async def run(settings: Settings) -> None:
         gui.create(font)  # type: ignore
 
     dpg.create_viewport(
-        title="HTML Style Enhancer", width=WINDOW_WIDTH, height=WINDOW_HEIGHT
+        title="HTML Style Enhancer",
+        width=WINDOW_WIDTH,
+        height=WINDOW_HEIGHT,
+        small_icon="icon.ico",
+        large_icon="icon.ico",
     )
     dpg.setup_dearpygui()
     dpg.show_viewport()
@@ -289,10 +293,12 @@ def proceed_callback(sender: Any, app_data: Any, stateful: StatefulData):
 
     font_color = f"rgb({int(font_color[0])},{int(font_color[1])},{int(font_color[2])})"
 
-    print(f"{font = }")
-    print(f"{font_size = }")
-    print(f"{font_color = }")
-    print(f"{background_image = }")
+    logger.info(f"Output File Name: <blue>{output_file}</blue>")
+    logger.info(f"Selector: <blue>{selector}</blue>")
+    logger.info(f"Font: <blue>{font}</blue>")
+    logger.info(f"Font Size: <blue>{font_size}</blue>")
+    logger.info(f"Font Color: <blue>{font_color}</blue>")
+    logger.info(f"Background Image URL: <blue>{background_image}</blue>")
 
     settings = Settings(
         test_mode=stateful.configuration.test_mode,
