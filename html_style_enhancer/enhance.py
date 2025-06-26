@@ -5,6 +5,7 @@ import re
 
 from datetime import datetime
 from functools import cache
+from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -13,6 +14,8 @@ import pandas as pd
 from aiofile import AIOFile
 from bs4 import BeautifulSoup
 
+from html_style_enhancer.excel import copy_dataframe_cells_to_excel_template
+from html_style_enhancer.excel import get_column_mapping
 from html_style_enhancer.log import logger
 
 
@@ -94,10 +97,10 @@ async def enhance(settings: Settings):
         for children in childrens:  # type: ignore
             children["style"] = f"{children['style']};color:inherit;"
 
-        modified_html = document.prettify()
+        modified_html = str(document)
 
         async with AIOFile(html_path, "w", encoding="utf-8") as f:
-            await f.write(str(modified_html))
+            await f.write(modified_html)
 
         series: dict[str, str] = {
             settings.html_source_column: html_source,
@@ -115,4 +118,17 @@ async def enhance(settings: Settings):
 
     df.to_excel(output_filename, engine="openpyxl", index=False)
 
-    logger.success(f"File <blue>{output_filename}</blue> has been generated")
+    logger.log(
+        "ACTION",
+        f"Formatting {Path(output_filename).name} ... <yellow>(it may take a few seconds, so wait for it to be finished.)</>",
+    )
+
+    column_mapping = get_column_mapping(settings.input_file, output_filename)
+
+    copy_dataframe_cells_to_excel_template(
+        filename=output_filename,
+        template_filename=os.path.abspath(settings.input_file),
+        column_mapping=column_mapping,
+    )
+
+    logger.success(f"File saved to <CYAN><white>{output_filename}</></>")

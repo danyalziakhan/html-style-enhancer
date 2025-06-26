@@ -225,6 +225,20 @@ wheels = [
 ]
 
 [[package]]
+name = "excelsheet"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "openpyxl" },
+    { name = "pandas" },
+    { name = "pywin32" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/20/59/141f222de3e5b479a96686b9886e33061a57a2cabdf313e3d13d86736a05/excelsheet-0.1.2.tar.gz", hash = "sha256:3e5d823c46f4c436dd93f3426a9a764b53bb262c9bed9e293c3e5cdf46117f93", size = 4787, upload-time = "2022-04-29T01:49:17.436Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/fa/2457c9541e5b11c15c79c42d53e4d09ed1f5d8e0fbe43431075cadd60132/excelsheet-0.1.2-py3-none-any.whl", hash = "sha256:1de5c97b9f22321fbd21416f2a672885dc76e75cc7c952e06256e6ba9820653a", size = 7454, upload-time = "2022-04-29T01:49:15.825Z" },
+]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.0.4"
 source = { registry = "https://pypi.org/simple" }
@@ -240,6 +254,55 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/48/5b/f636517f40fc5afb720354236cea729de30d440f06bdafb7f33ca969956c/executing-1.1.1.tar.gz", hash = "sha256:b0d7f8dcc2bac47ce6e39374397e7acecea6fdc380a6d5323e26185d70f38ea8", size = 651233, upload-time = "2022-10-08T15:36:32.615Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/72/ac/593502a97a0bf7968a2c958a25f5f697ef738f6cd9fcc94d0d6a1493e080/executing-1.1.1-py2.py3-none-any.whl", hash = "sha256:236ea5f059a38781714a8bfba46a70fad3479c2f552abee3bbafadc57ed111b8", size = 22605, upload-time = "2022-10-08T15:36:29.512Z" },
+]
+
+[[package]]
+name = "html-style-enhancer"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "aiofile" },
+    { name = "beautifulsoup4" },
+    { name = "cssutils" },
+    { name = "dearpygui" },
+    { name = "excelsheet" },
+    { name = "loguru" },
+    { name = "openpyxl" },
+    { name = "pandas" },
+    { name = "psutil" },
+    { name = "tqdm" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "ipykernel" },
+    { name = "ipython" },
+    { name = "isort" },
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiofile", specifier = ">=3.8.1,<4" },
+    { name = "beautifulsoup4", specifier = ">=4.11.1,<5" },
+    { name = "cssutils", specifier = ">=2.6.0,<3" },
+    { name = "dearpygui", specifier = ">=1.8.0,<2" },
+    { name = "excelsheet", specifier = ">=0.1.2" },
+    { name = "loguru", specifier = ">=0.6.0,<0.7" },
+    { name = "openpyxl", specifier = ">=3.0.10,<4" },
+    { name = "pandas", specifier = ">=1.5.2,<2" },
+    { name = "psutil", specifier = ">=5.9.4,<6" },
+    { name = "tqdm", specifier = ">=4.64.1,<5" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black", specifier = ">=22.10.0,<23" },
+    { name = "ipykernel", specifier = ">=6.17.1,<7" },
+    { name = "ipython", specifier = ">=8.7.0,<9" },
+    { name = "isort", specifier = ">=5.10.1,<6" },
+    { name = "pytest", specifier = ">=7.2.0,<8" },
 ]
 
 [[package]]
@@ -638,15 +701,13 @@ wheels = [
 
 [[package]]
 name = "pywin32"
-version = "305"
+version = "303"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/e4/76dab43949fc3ba9aee8dc0635b299ad09df7813e81aa4adc88e27f463fe/pywin32-305-cp310-cp310-win32.whl", hash = "sha256:421f6cd86e84bbb696d54563c48014b12a23ef95a14e0bdba526be756d89f116", size = 10990975, upload-time = "2022-11-06T07:15:00.765Z" },
-    { url = "https://files.pythonhosted.org/packages/02/80/23fdb88f8a398dff615f10100cf54871fd8518e3eeea72c1a7d46af01bf9/pywin32-305-cp310-cp310-win_amd64.whl", hash = "sha256:73e819c6bed89f44ff1d690498c0a811948f73777e5f97c494c152b850fad478", size = 12136144, upload-time = "2022-11-06T07:15:10.731Z" },
-    { url = "https://files.pythonhosted.org/packages/05/19/e1f2d772c5437f37c7dbe88be56939de53f040674b6accf2c0369674873d/pywin32-305-cp310-cp310-win_arm64.whl", hash = "sha256:742eb905ce2187133a29365b428e6c3b9001d79accdc30aa8969afba1d8470f4", size = 11199128, upload-time = "2022-11-06T07:15:18.857Z" },
-    { url = "https://files.pythonhosted.org/packages/66/e8/0078d6042bf5bce7e2518b32cf1a0c1399a64f91fc280bb1cfda69fcdb35/pywin32-305-cp311-cp311-win32.whl", hash = "sha256:19ca459cd2e66c0e2cc9a09d589f71d827f26d47fe4a9d09175f6aa0256b51c2", size = 10992077, upload-time = "2022-11-06T07:15:26.936Z" },
-    { url = "https://files.pythonhosted.org/packages/22/da/344b3df042f42d9d775ae2030276b2992adab519c6d682393ddf356775f3/pywin32-305-cp311-cp311-win_amd64.whl", hash = "sha256:326f42ab4cfff56e77e3e595aeaf6c216712bbdd91e464d167c6434b28d65990", size = 12137015, upload-time = "2022-11-06T07:15:36.266Z" },
-    { url = "https://files.pythonhosted.org/packages/a2/df/cb14fa23ef0782e62df7b33ea2b926150de3b1d71d2713f434582f8a0024/pywin32-305-cp311-cp311-win_arm64.whl", hash = "sha256:4ecd404b2c6eceaca52f8b2e3e91b2187850a1ad3f8b746d0796a98b4cea04db", size = 11198967, upload-time = "2022-11-06T07:15:44.608Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/d4/6f3f7697acba4f2e732b3519dd9ba7b045b2d61f5fe750dbf16baf894f2c/pywin32-303-cp310-cp310-win32.whl", hash = "sha256:6fed4af057039f309263fd3285d7b8042d41507343cd5fa781d98fcc5b90e8bb", size = 8416705, upload-time = "2021-12-20T01:31:04.67Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/48/aed127b4d366c22646355817d579a209f7646ec9e595e8495d0ca4b0ba12/pywin32-303-cp310-cp310-win_amd64.whl", hash = "sha256:51cb52c5ec6709f96c3f26e7795b0bf169ee0d8395b2c1d7eb2c029a5008ed51", size = 9185409, upload-time = "2021-12-20T01:31:18.523Z" },
+    { url = "https://files.pythonhosted.org/packages/43/2f/d6d0e693a578989f73074da8cab76e3fb312a8e246d10b67dd7caba81e52/pywin32-303-cp311-cp311-win32.whl", hash = "sha256:d9b5d87ca944eb3aa4cd45516203ead4b37ab06b8b777c54aedc35975dec0dee", size = 8416918, upload-time = "2021-12-20T01:31:33.296Z" },
+    { url = "https://files.pythonhosted.org/packages/04/9f/79b2fb648c977bedabae0f0cd468ad39828b449589d083bc201bd489b63e/pywin32-303-cp311-cp311-win_amd64.whl", hash = "sha256:fcf44032f5b14fcda86028cdf49b6ebdaea091230eb0a757282aa656e4732439", size = 9185632, upload-time = "2021-12-20T01:31:48.427Z" },
 ]
 
 [[package]]
@@ -679,53 +740,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/cb/e1/6441995e97a3fdd7cb9c85791d95a4f902b328fe5ef295f9fb3b039facdf/pyzmq-24.0.1-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:a180dbd5ea5d47c2d3b716d5c19cc3fb162d1c8db93b21a1295d69585bfddac1", size = 1628197, upload-time = "2022-09-21T11:50:45.059Z" },
     { url = "https://files.pythonhosted.org/packages/37/bc/b06363931ea30e29d96b108f711e77740f9d599f6494604c544e9169fe98/pyzmq-24.0.1-cp311-cp311-win32.whl", hash = "sha256:624321120f7e60336be8ec74a172ae7fba5c3ed5bf787cc85f7e9986c9e0ebc2", size = 889207, upload-time = "2022-09-21T11:47:09.482Z" },
     { url = "https://files.pythonhosted.org/packages/be/23/0a0534008de7b1e12e17077a465626405a53c5d66f2e6af2c8da0d9c5471/pyzmq-24.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:1724117bae69e091309ffb8255412c4651d3f6355560d9af312d547f6c5bc8b8", size = 990257, upload-time = "2022-09-21T11:50:53.684Z" },
-]
-
-[[package]]
-name = "html-style-enhancer"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "aiofile" },
-    { name = "beautifulsoup4" },
-    { name = "cssutils" },
-    { name = "dearpygui" },
-    { name = "loguru" },
-    { name = "openpyxl" },
-    { name = "pandas" },
-    { name = "psutil" },
-    { name = "tqdm" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "black" },
-    { name = "ipykernel" },
-    { name = "ipython" },
-    { name = "isort" },
-    { name = "pytest" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiofile", specifier = ">=3.8.1,<4" },
-    { name = "beautifulsoup4", specifier = ">=4.11.1,<5" },
-    { name = "cssutils", specifier = ">=2.6.0,<3" },
-    { name = "dearpygui", specifier = ">=1.8.0,<2" },
-    { name = "loguru", specifier = ">=0.6.0,<0.7" },
-    { name = "openpyxl", specifier = ">=3.0.10,<4" },
-    { name = "pandas", specifier = ">=1.5.2,<2" },
-    { name = "psutil", specifier = ">=5.9.4,<6" },
-    { name = "tqdm", specifier = ">=4.64.1,<5" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "black", specifier = ">=22.10.0,<23" },
-    { name = "ipykernel", specifier = ">=6.17.1,<7" },
-    { name = "ipython", specifier = ">=8.7.0,<9" },
-    { name = "isort", specifier = ">=5.10.1,<6" },
-    { name = "pytest", specifier = ">=7.2.0,<8" },
 ]
 
 [[package]]
